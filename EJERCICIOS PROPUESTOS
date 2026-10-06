@@ -1,0 +1,175 @@
+# Ejercicios Propuestos de Recursividad
+
+import random
+import sys
+import time
+import timeit
+from collections import Counter
+
+
+# 2.1 Elemento mayor de una sucesion
+def maximo(s, n):
+    if n == 1:
+        return s[0]
+    m = maximo(s, n - 1)
+    if s[n - 1] > m:
+        return s[n - 1]
+    return m
+
+
+# 2.2 Busqueda de texto
+def coincide(p, t, i, j=0):
+    if j == len(p):
+        return True
+    return t[i + j] == p[j] and coincide(p, t, i, j + 1)
+
+
+def busca_texto(p, t, i=0):
+    if i > len(t) - len(p):
+        return 0
+    if coincide(p, t, i):
+        return i + 1
+    return busca_texto(p, t, i + 1)
+
+
+# 2.3 Ordenacion por insercion
+def insertar(s, j, val):
+    if j >= 0 and val < s[j]:
+        s[j + 1] = s[j]
+        insertar(s, j - 1, val)
+    else:
+        s[j + 1] = val
+
+
+def insercion_por_orden(s, n):
+    if n <= 1:
+        return
+    insercion_por_orden(s, n - 1)
+    insertar(s, n - 2, s[n - 1])
+
+
+# 2.4 Desordenar una sucesion (Fisher-Yates)
+def desordena(a, i=0):
+    if i >= len(a) - 1:
+        return
+    k = random.randint(i, len(a) - 1)
+    a[i], a[k] = a[k], a[i]
+    desordena(a, i + 1)
+
+
+# 2.5 Prueba Chi-Cuadrado de aleatoriedad
+def prueba_aleatoriedad(n_pruebas=60000):
+    cont = Counter()
+    for _ in range(n_pruebas):
+        arr = [1, 2, 3]
+        desordena(arr)
+        cont[tuple(arr)] += 1
+
+    esperado = n_pruebas / 6
+    chi2 = 0
+    for p in sorted(cont):
+        chi2 += (cont[p] - esperado) ** 2 / esperado
+    return chi2
+
+
+# 2.6 Ordenacion por seleccion
+def seleccion_por_orden(s, i=0):
+    if i >= len(s) - 1:
+        return
+    m = min(range(i, len(s)), key=lambda k: s[k])
+    s[i], s[m] = s[m], s[i]
+    seleccion_por_orden(s, i + 1)
+
+
+# 2.7 Comparacion de tiempos entre insercion y seleccion
+def comparar_tiempos():
+    sys.setrecursionlimit(10000)
+
+    def medir(f, datos):
+        d = datos[:]
+        t = time.perf_counter()
+        f(d)
+        return time.perf_counter() - t
+
+    res = []
+    for n in (100, 300):
+        casos = {
+            "creciente": list(range(n)),
+            "decreciente": list(range(n, 0, -1)),
+            "duplicados": [random.randint(0, 5) for _ in range(n)],
+            "aleatorio": random.sample(range(n), n),
+        }
+        for nombre, datos in casos.items():
+            t_ins = medir(lambda d: insercion_por_orden(d, len(d)), datos)
+            t_sel = medir(seleccion_por_orden, datos)
+            res.append((n, nombre, t_ins, t_sel))
+    return res
+
+
+# 2.8 Factorial recursivo vs iterativo
+def fact_rec(n):
+    if n == 0:
+        return 1
+    return n * fact_rec(n - 1)
+
+
+def fact_it(n):
+    r = 1
+    for i in range(2, n + 1):
+        r *= i
+    return r
+
+
+# 2.9 Fibonacci recursivo vs iterativo
+def fib_rec(n):
+    if n < 2:
+        return n
+    return fib_rec(n - 1) + fib_rec(n - 2)
+
+
+def fib_it(n):
+    a, b = 0, 1
+    for _ in range(n):
+        a, b = b, a + b
+    return a
+
+
+# 2.10 Robot con pasos de 1 y 2 metros
+def caminos_1_2(n, pasos=(1, 2)):
+    if n == 0:
+        return [[]]
+    res = []
+    for p in pasos:
+        if p <= n:
+            for c in caminos_1_2(n - p, pasos):
+                res.append([p] + c)
+    return res
+
+
+# 2.11 Robot con pasos de 1, 2 y 3 metros
+def caminos_1_2_3(n, pasos=(1, 2, 3)):
+    if n == 0:
+        return [[]]
+    res = []
+    for p in pasos:
+        if p <= n:
+            for c in caminos_1_2_3(n - p, pasos):
+                res.append([p] + c)
+    return res
+
+
+# 2.12 Potencia por division del exponente
+def potencia(b, n):
+    if n == 0:
+        return 1
+    mitad = potencia(b, n // 2)
+    if n % 2 == 0:
+        return mitad * mitad
+    return mitad * mitad * b
+
+
+# 2.13 Suma mediante incrementos
+def suma_inc(a, b):
+    if b == 0:
+        return a
+    return suma_inc(a, b - 1) + 1
