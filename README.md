@@ -5,7 +5,7 @@
 **Asignatura:** Estructuras Discretas  
 **Estudiante:** Salazar Aguirre, Edwin David  
 **Código:** 2024003635  
-**Fecha:** 29/09/2026  
+**Fecha:** 05/10/2026
 
 ---
 
